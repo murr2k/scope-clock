@@ -1,0 +1,2 @@
+# Host preview / font codegen. SVG output needs nothing; PNG needs Pillow.
+pillow>=10

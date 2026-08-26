@@ -1,0 +1,46 @@
+{
+  "_comment": [
+    "Project-local board: a copy of platform-ststm32's nucleo_g491re with",
+    "libopencm3 added to `frameworks`.  The stock definition lists only",
+    "stm32cube, which is why `pio boards` does not offer this board for a",
+    "libopencm3 build -- but libopencm3 does support the part (its",
+    "ld/devices.data matches stm32g4?1?e* -> ROM=512K RAM=96K CCM=16K).",
+    "",
+    "maximum_ram_size is deliberately 96K, not the chip's 112K: libopencm3's",
+    "generated linker script puts only SRAM1+SRAM2 in the `ram` region and",
+    "leaves the 16K CCM at 0x10000000, so 96K is what the link actually",
+    "enforces and what the RAM percentage should be measured against.",
+    "The frames fit in 96K with room to spare, so unlike the G431 build this",
+    "target needs no custom linker script.",
+    "",
+    "Named with an _ocm3 suffix so the override is explicit: a same-named file",
+    "would silently shadow the platform's board if it ever gains libopencm3."
+  ],
+  "build": {
+    "core": "stm32",
+    "cpu": "cortex-m4",
+    "extra_flags": "-DSTM32G4 -DSTM32G4xx -DSTM32G491xx",
+    "f_cpu": "170000000L",
+    "mcu": "stm32g491ret6",
+    "product_line": "STM32G491xx",
+    "variant": "STM32G491RE"
+  },
+  "connectivity": ["can"],
+  "debug": {
+    "default_tools": ["stlink"],
+    "jlink_device": "STM32G491RE",
+    "onboard_tools": ["stlink"],
+    "openocd_target": "stm32g4x",
+    "svd_path": "STM32G491xx.svd"
+  },
+  "frameworks": ["stm32cube", "libopencm3"],
+  "name": "Nucleo G491RE (libopencm3)",
+  "upload": {
+    "maximum_ram_size": 98304,
+    "maximum_size": 524288,
+    "protocol": "stlink",
+    "protocols": ["stlink", "jlink", "cmsis-dap", "blackmagic", "mbed"]
+  },
+  "url": "https://www.st.com/en/evaluation-tools/nucleo-g491re.html",
+  "vendor": "ST"
+}
