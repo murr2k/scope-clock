@@ -9,3 +9,6 @@ firmware/stm32/.pio/
 tools/out/*
 !tools/out/contact_sheet.png
 !tools/out/scope_expected.png
+
+# Keysight scope manual: 10 MB vendor doc, freely available upstream.
+docs/4000X-UG-*.pdf

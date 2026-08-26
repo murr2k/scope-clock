@@ -104,6 +104,47 @@ brightness is a time-average of the Y deflection. It is not a PWM duty cycle.
 
 The G431KB Nucleo-32 does not have this problem (its LD2 is on PB8).
 
+## Driving a Keysight InfiniiVision (DSO, not a CRT)
+
+Measured against a **DSOX4034A**; the same applies to the 2000/3000/4000
+X-Series. Reference: Keysight *InfiniiVision 4000 X-Series Oscilloscopes User's
+Guide* (54709-97072), pages 71 and 74 - free from keysight.com, not mirrored
+here.
+
+**It has a real Z input, and no transistor is needed.** In XY mode the scope
+reassigns its inputs (UG p71, p74):
+
+| Scope input | Signal | From |
+|---|---|---|
+| Channel 1 | X | PA4 (`A2`) |
+| Channel 2 | Y | PA5 (`D13`) |
+| **EXT TRIG IN** | **Z (blanking)** | PB6 (`D10`) **direct, no Q1** |
+
+EXT TRIG IN is a 1 Mohm logic-level input switching at 1.4 V (300 Vrms abs max),
+so a 3.3 V GPIO drives it directly at about 3 uA. Q1 exists only for analog CRTs
+whose intensity input needs a different level. On this scope the whole clock is
+**one IC and four wires**.
+
+Polarity is the opposite of a typical CRT, and the manual is explicit:
+
+> "When Z is low (<1.4 V), Y versus X is displayed; when Z is high (>1.4 V), the
+> trace is turned off."
+
+So beam-ON must be LOW. `board_g491.h` therefore sets `ZBLANK_ACTIVE_HIGH 0`.
+If you move to a CRT that brightens on a positive Z, flip it back to 1.
+
+### Scope setup
+
+1. `[Horiz]` -> **Time Mode** -> **XY** (UG p71).
+2. Channels 1 and 2 **DC coupled**, equal V/div (~0.5 V/div for the 0-3.3 V swing),
+   and use the position knobs to bring mid-scale to screen centre.
+3. Turn on **infinite persistence**. This matters: a DSO does not have a
+   phosphor, it plots sampled points, so persistence is what accumulates the
+   frame into a picture instead of a sparse scatter.
+4. Set the acquisition window to cover at least one whole frame. The analog
+   face is 2097 points at 200 kSa/s = **10.5 ms**, so roughly 1-2 ms/div.
+   Too short a window and you will see only an arc of the clock at a time.
+
 ## Setting the time
 
 The ST-Link VCP is USART2, the same UART the ESP-01 protocol uses, so the clock

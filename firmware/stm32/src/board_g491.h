@@ -46,7 +46,11 @@ typedef uint32_t ve_word_t;
 /* ---- Z-axis blanking ---- */
 #define ZBLANK_PORT         GPIOB
 #define ZBLANK_PIN          GPIO6
-#define ZBLANK_ACTIVE_HIGH  1
+/* 0 = beam-ON drives the pin LOW.  Set for the Keysight InfiniiVision, whose
+ * Z input is active-low for display: UG page 74, "When Z is low (<1.4 V), Y
+ * versus X is displayed; when Z is high (>1.4 V), the trace is turned off."
+ * An analog CRT with a bright-up Z input usually wants the opposite (1). */
+#define ZBLANK_ACTIVE_HIGH  0
 
 #if ZBLANK_ACTIVE_HIGH
 #  define ZBSRR_ON   ((uint32_t)ZBLANK_PIN)
