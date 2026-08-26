@@ -91,6 +91,79 @@ Board-specific scene/budget knobs live in the board header:
 matching entry in `tools/vengine.py` `TARGETS` - **change both together**, the
 checker enforces it.
 
+## Bench / HITL: driving the scope from here
+
+**Claude drives the scope directly on the HITL bench.** This is the operational
+procedure - follow it rather than improvising, because two of the steps are
+non-obvious and their absence looks exactly like a firmware bug.
+
+Scope: Keysight InfiniiVision (DSOX4034A; same for the 2000/3000/4000 X-Series).
+
+### Wiring (verified against UM2505 Table 16)
+
+| Scope input | Signal | Board pin | Header label |
+|---|---|---|---|
+| Channel 1 | X | PA4 | `A2` |
+| Channel 2 | Y | PA5 | `D13` |
+| EXT TRIG IN | Z / blanking | PB6 | `D10` (direct, no transistor) |
+| GND | - | GND | power header |
+
+In XY mode the scope reassigns CH1/CH2/EXT TRIG as X/Y/Z. EXT TRIG is 1 Mohm
+with a 1.4 V threshold, so the 3.3 V GPIO drives it directly.
+**Open solder bridge SB6 first** or LD2 loads the Y axis.
+
+### SCPI bring-up sequence
+
+```
+:TIMebase:MODE XY            ; CH1=X, CH2=Y, EXT TRIG=Z
+:CHANnel1:DISPlay ON
+:CHANnel2:DISPlay ON
+:CHANnel1:PROBe 1            ; set 10 for a 10:1 probe, or the scale is 10x off
+:CHANnel2:PROBe 1
+:CHANnel1:COUPling DC        ; AC coupling drifts and distorts: the signal is 0-3.3 V
+:CHANnel2:COUPling DC
+:CHANnel1:SCALe 0.5          ; 3.3 V over ~6.6 of 8 divisions
+:CHANnel2:SCALe 0.5
+:CHANnel1:OFFSet 1.65        ; centre mid-scale on screen
+:CHANnel2:OFFSet 1.65
+:TIMebase:SCALe 2e-3         ; see "window" below
+:DISPlay:PERSistence INFinite
+:CDISplay
+:RUN
+```
+
+Verify by grabbing the screen: `:DISPlay:DATA? PNG` returns an IEEE
+definite-length binary block. Decode and LOOK at it - that is the whole point
+of the HITL rig, and it beats inferring from register reads.
+
+### The two steps that look like firmware bugs if skipped
+
+1. **Infinite persistence is mandatory.** A DSO has no phosphor; it plots
+   sampled points. Without persistence the clock appears as a sparse scatter of
+   dots, not a picture.
+2. **The acquisition window must span a whole frame.** The analog face is ~2100
+   points at 200 kSa/s = **10.5 ms**. At 10 divisions, 2 ms/div gives a 20 ms
+   window, about two frames. Too short and only an *arc* of the clock is
+   captured, which reads convincingly as "the firmware only draws part of it".
+
+Do **not** use `:AUToscale` in XY mode; it will undo the setup above.
+
+### Interpreting what comes back
+
+- Ellipse instead of a circle -> the two channels are on different V/div.
+- Mirrored or rotated -> swap probes. `pack_xy()` is hardware-truth; do not
+  "fix" it by transforming the geometry.
+- Faint lines joining the strokes -> Z is not connected or its polarity is
+  wrong. `ZBLANK_ACTIVE_HIGH 0` is correct for this scope (UG p74: Z low
+  displays, Z high blanks).
+- Frozen picture -> read `g_millis` over SWD before suspecting the display; the
+  DMA streams autonomously and will happily loop a stale frame with a dead CPU.
+
+Time and mode are set over the ST-Link VCP (USART2) at 115200:
+`T=<utc_epoch>`, `TZ=<offset_sec>`, `MODE=ANALOG|DIGITAL|MESSAGE|TEST`,
+`M=<text>`. `MODE=TEST` draws a box + circle + crosshair and is by far the
+easiest target for getting the framing right.
+
 ## Invariants & "do not regress"
 
 - **`tools/vectorfont.py` is the only place glyphs are defined.** After editing

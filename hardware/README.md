@@ -135,6 +135,9 @@ If you move to a CRT that brightens on a positive Z, flip it back to 1.
 
 ### Scope setup
 
+For the SCPI sequence Claude uses to drive this scope on the HITL bench, see
+the "Bench / HITL" section of `CLAUDE.md` at the repo root.
+
 1. `[Horiz]` -> **Time Mode** -> **XY** (UG p71).
 2. Channels 1 and 2 **DC coupled**, equal V/div (~0.5 V/div for the 0-3.3 V swing),
    and use the position knobs to bring mid-scale to screen centre.
