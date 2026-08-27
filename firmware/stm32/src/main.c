@@ -61,6 +61,12 @@ static void clock_and_systick(void)
      * HSI: 84 MHz sysclk, APB1 /2 = 42 MHz, timer clock x2 = 84 MHz. */
     rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]);
     const uint32_t ahb_hz = 84000000u;
+#elif defined(BOARD_WEACT_G431CB)
+    /* This board has a real 8 MHz HSE crystal (X2, +/-10 ppm).  Since the
+     * wall clock is carried on SysTick, the system clock IS the timekeeping
+     * accuracy, so the crystal is worth ~1 s/day instead of the HSI's ~14 min. */
+    rcc_clock_setup_pll(&rcc_hse_8mhz_3v3[RCC_CLOCK_3V3_170MHZ]);
+    const uint32_t ahb_hz = 170000000u;
 #elif defined(BOARD_NUCLEO_G431KB) || defined(BOARD_NUCLEO_G491RE)
     /* These Nucleos have no HSE crystal either.  170 MHz needs boost mode and the
      * right flash latency; libopencm3's config table handles that sequence. */
@@ -131,11 +137,11 @@ int main(void)
 
 #if BOARD_HAS_BUTTON
     rcc_periph_clock_enable(BUTTON_RCC);
-    /* An active-low button (the Nucleo B1) shorts to ground, so it needs the
-     * internal pull-up; an active-high one (Discovery) drives both rails. */
-    gpio_mode_setup(BUTTON_PORT, GPIO_MODE_INPUT,
-                    BUTTON_ACTIVE_HIGH ? GPIO_PUPD_NONE : GPIO_PUPD_PULLUP,
-                    BUTTON_PIN);
+    /* The pull direction is the board's business, not a rule derived from
+     * polarity: the WeAct KEY is active-high with NO external pull-down, so it
+     * needs an internal pull-down, while the Discovery's active-high button
+     * already has one on the board. */
+    gpio_mode_setup(BUTTON_PORT, GPIO_MODE_INPUT, BUTTON_PUPD, BUTTON_PIN);
 #endif
 
     /* initial active frame: bring-up test pattern */

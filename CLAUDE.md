@@ -186,7 +186,7 @@ easiest target for getting the framing right.
   fit a slower RC, raise `VE_DEFAULT_MOVE_SETTLE` to match.
 - **`pack_xy()`, `world_to_ccr()` and `ZBLANK_ACTIVE_HIGH` are hardware-truth**,
   tuned against the `MODE_TEST` pattern, not by rotating/mirroring the geometry.
-- **The G431 needs `ld/stm32g431kb_32k.ld`; do not drop back to the generated
+- **The G431 needs `ld/stm32g431_32k.ld`; do not drop back to the generated
   script.** libopencm3 generates `ram = 22K` (SRAM1+SRAM2) and offers the 10 KB
   CCM only at 0x10000000. **Why:** the frames are ~24 KB, so the stock script
   overflows by 2788 bytes. On category 2 G4 parts the CCM is aliased at

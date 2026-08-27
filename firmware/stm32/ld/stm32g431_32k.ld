@@ -1,4 +1,4 @@
-/* stm32g431kb_32k.ld -- claim all 32 KB of the G431KB's SRAM.
+/* stm32g431_32k.ld -- claim all 32 KB of the G431KB's SRAM.
  *
  * WHY THIS FILE EXISTS
  * --------------------

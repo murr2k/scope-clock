@@ -15,6 +15,8 @@
 #  include "board_g431.h"
 #elif defined(BOARD_NUCLEO_G491RE)
 #  include "board_g491.h"
+#elif defined(BOARD_WEACT_G431CB)
+#  include "board_weact_g431.h"
 #elif defined(BOARD_DISCO_F407VG)
 #  include "board_f407.h"
 #else

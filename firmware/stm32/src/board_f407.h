@@ -46,6 +46,7 @@ typedef uint32_t ve_word_t;
 #define BUTTON_PIN         GPIO0
 #define BUTTON_RCC         RCC_GPIOA
 #define BUTTON_ACTIVE_HIGH 1
+#define BUTTON_PUPD        GPIO_PUPD_NONE   /* Discovery has an external pull-down */
 
 /* ---- ESP-01 link ---- */
 #define ESP_USART          USART2

@@ -52,6 +52,13 @@ TARGETS = {
     # but only 32 KB SRAM (22 KB of it contiguous).  A double-buffered frame
     # costs 16 bytes/point, so 1536 points = 24 KB is the ceiling and the
     # analog face drops its 48 in-between minute ticks.  170 MHz/1360 = 125 kSa/s.
+    # WeAct STM32G431CBU6 core board: same silicon and same 32 KB limit as the
+    # G431KB, so identical scene numbers.  Differs off-chip: free DAC pins and
+    # an 8 MHz HSE crystal.
+    "weact_g431": dict(max_code=4095, step=0.013, max_points=1536,
+                 sample_rate=125_000, move_settle=1, pwm_div=0,
+                 minute_ticks=False,
+                 note="dual 12-bit DAC, buffered, 32 KB SRAM, HSE crystal"),
     "g431": dict(max_code=4095, step=0.013, max_points=1536,
                  sample_rate=125_000, move_settle=1, pwm_div=0,
                  minute_ticks=False,

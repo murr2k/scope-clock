@@ -34,7 +34,8 @@ STUB = os.path.join(HC, "stub")
 
 BOARD_DEFINE = {"f407": "BOARD_DISCO_F407VG", "f401": "BOARD_NUCLEO_F401RE",
                 "g431": "BOARD_NUCLEO_G431KB",
-                "g491": "BOARD_NUCLEO_G491RE"}
+                "g491": "BOARD_NUCLEO_G491RE",
+                "weact_g431": "BOARD_WEACT_G431CB"}
 
 # Must match host_check.c
 SCENE_SPECS = [

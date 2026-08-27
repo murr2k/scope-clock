@@ -16,10 +16,52 @@ Four builds are documented here:
 
 | | Chips | X/Y quality | Notes |
 |---|---|---|---|
+| **WeAct G431CBU6** | **1 + Q1** | 12-bit, buffered | DAC pins free (no board mod); 8 MHz HSE crystal; 32 KB SRAM |
 | **G491RE** | **1 + Q1** | 12-bit, buffered | **verified on hardware**; full 4096-pt budget |
 | G431KB | **1 + Q1** | 12-bit, buffered | 32 KB SRAM caps the frame at 1536 pts |
 | F401RE | 1 + 8 passives | 8-bit, RC-smoothed | uses hardware you own |
 | F407 + ESP-01 | 3 + Q1 | 12-bit + op-amp | adds WiFi/SNTP |
+
+---
+
+# WeAct Studio STM32G431CBU6 Core Board
+
+Same silicon as the NUCLEO-G431KB, so it shares `dac_dma_g4.c` and the 32 KB
+CCM-alias linker script. Verified against the maker's schematic, kept as
+`docs/weact-g431cbu6-schematic.pdf`.
+
+| Signal | Pin | Where |
+|---|---|---|
+| X | PA4 | header P2 |
+| Y | PA5 | header P2 |
+| Z-blank | PB6 | header P1 (SB3/SB6 unfitted, so it is free) |
+| Mode button | PC13 | on-board KEY (SW2) |
+| Spare LED | PC6 | on-board blue |
+
+## Why this is the best host so far
+
+- **PA4/PA5 carry nothing else.** The Nucleo-64 hangs LD2 off PA5 and needs SB6
+  lifted before the Y axis can be trusted. Here the DAC pins run straight to the
+  header, so there is no board modification at all.
+- **A real 8 MHz HSE crystal** (X2, XTAL3225, +/-10 ppm). Because the wall clock
+  rides on SysTick, the system clock *is* the timekeeping accuracy: the HSI is
+  ~1% (about 14 min/day), this crystal is ~10 ppm (about 1 s/day).
+
+## What it costs
+
+- **32 KB SRAM**, so the budget is back to 1536 points and the face keeps only
+  its 12 five-minute ticks. The G491's full 4096-point face does not fit.
+- **No on-board debugger.** Flash over the P3 SWD header (PA13 SWDIO, PA14
+  SWCLK) with an external ST-Link, or via USB DFU holding BOOT0 (SW3, PB8).
+- **No USB-serial bridge**, so there is no `T=`/`MODE=` path out of the box. The
+  PC13 KEY cycles modes instead; for time-setting, wire a USB-TTL adapter's TX
+  to PA10 (USART1_RX). The firmware is receive-only, so that one wire plus
+  ground is enough.
+
+The KEY is wired PC13 - 330R - SW2 - 3V3 with no external pull-down, so it is
+active HIGH and the firmware enables an internal pull-down. That is the opposite
+of both Nucleos, and it is why the pull direction is now a per-board macro
+(`BUTTON_PUPD`) rather than something inferred from polarity.
 
 ---
 

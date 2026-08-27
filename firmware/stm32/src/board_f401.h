@@ -73,6 +73,7 @@ typedef uint16_t ve_word_t;         /* CCR values fit in 16 bits */
 #define BUTTON_PIN          GPIO13
 #define BUTTON_RCC          RCC_GPIOC
 #define BUTTON_ACTIVE_HIGH  0
+#define BUTTON_PUPD         GPIO_PUPD_PULLUP
 
 /* ---- ESP-01 / VCP link ---- */
 #define ESP_USART           USART2
