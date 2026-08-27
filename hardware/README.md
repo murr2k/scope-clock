@@ -51,8 +51,31 @@ CCM-alias linker script. Verified against the maker's schematic, kept as
 
 - **32 KB SRAM**, so the budget is back to 1536 points and the face keeps only
   its 12 five-minute ticks. The G491's full 4096-point face does not fit.
-- **No on-board debugger.** Flash over the P3 SWD header (PA13 SWDIO, PA14
-  SWCLK) with an external ST-Link, or via USB DFU holding BOOT0 (SW3, PB8).
+- **No on-board debugger.** Two ways in, and the choice matters more than it
+  looks:
+
+  - **USB DFU** - no extra hardware. Hold BOOT0 (SW3) while resetting, then
+    `pio run -e weact_g431cb -t upload`. The env is configured for this.
+  - **SWD on header P3** (PA13 SWDIO, PA14 SWCLK, 3V3, GND) with an external
+    ST-Link. **Prefer this for bring-up.** DFU only writes flash; SWD also
+    allows halting and reading registers, which is how every firmware bug in
+    this project so far was actually found - the DAC trigger-select inversion
+    and the hard fault were both diagnosed from `DMA1_CNDTR`, `DAC_CR` and
+    `CFSR`, not from looking at the screen. Without SWD, a board that does not
+    work is a board you cannot interrogate.
+
+  The ST-LINK/V3E on a NUCLEO board can program external targets, so the
+  Nucleo already on the bench can serve as the debugger here.
+
+### The D: drive is not a bootloader
+
+This board enumerates as a small FAT volume labelled `WEACT-G431` containing
+only `README.txt`. That is the **factory USB mass-storage demo application**
+(`Examples/04-MSC` in the maker's repo), not a bootloader - copying a `.bin`
+onto it programs nothing, and the drive vanishes the moment real firmware is
+flashed. Drag-and-drop flashing works on UF2 boards (`INFO_UF2.TXT`) and on
+ST-Link/mbed Nucleo drives (`MBED.HTM`, where a second MCU does the SWD
+programming); neither applies here.
 - **No USB-serial bridge**, so there is no `T=`/`MODE=` path out of the box. The
   PC13 KEY cycles modes instead; for time-setting, wire a USB-TTL adapter's TX
   to PA10 (USART1_RX). The firmware is receive-only, so that one wire plus
