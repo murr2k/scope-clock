@@ -227,7 +227,10 @@ easiest target for getting the framing right.
   face ring), both frame buffers holding the 2101-point analog face, `CMAR`
   alternating between them (so the tear-free swap works), SysTick advancing
   ~1000/s, and `HFSR`/`CFSR` clean. `TZ=`/`T=`/`MODE=` over the COM13 VCP were
-  parsed and took effect. **Not yet looked at on an actual oscilloscope.**
+  parsed and took effect. **Confirmed visually on 2026-08-26** on a Keysight
+  InfiniiVision (DSOX4034A) at the bench: the rendered image is correct and the
+  refresh is stable. That closes the loop - everything before it was inferred
+  from register reads and host simulation.
 - All four targets compile and link clean for ARM (zero warnings) with
   PlatformIO + arm-none-eabi-gcc 7.2.1. The other three remain unflashed.
 - **The F401 has no DAC and no TIM6/TIM7** (verified against RM0368: no such

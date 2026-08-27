@@ -67,6 +67,9 @@ docs/         design + protocol + verification
 
 ## Status
 
-Host tooling works and is verified. The STM32 firmware is a complete reference
-build, **bring-up pending on hardware** - the register-level DAC/DMA/RTC setup
-has inline verification checklists. See `CLAUDE.md` and `docs/DESIGN.md`.
+**Working on hardware.** The NUCLEO-G491RE build was brought up on 2026-08-26
+and confirmed on a Keysight InfiniiVision DSOX4034A: the clock renders correctly
+and the refresh is stable at ~95 Hz.
+
+Host tooling is verified, and all four targets compile clean. The G431, F401
+and F407 targets remain unflashed. See `CLAUDE.md` and `docs/DESIGN.md`.

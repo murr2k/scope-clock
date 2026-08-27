@@ -162,6 +162,9 @@ the connector pinout, and Table 11 for the solder bridges (SB6 = LD2 on PA5).
 
 ## Status
 
+The NUCLEO-G491RE build is **working on real hardware**, confirmed on a
+Keysight InfiniiVision DSOX4034A on 2026-08-26.
+
 Host tooling (font, engine, scenes, preview) runs and is verified visually.
 The STM32 firmware is a complete reference build for STM32F407 + libopencm3 and
 is **bring-up-pending on hardware** - the register-level DAC/TIM6/DMA/RTC setup
